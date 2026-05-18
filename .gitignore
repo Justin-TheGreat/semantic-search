@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+venv/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Secrets — NEVER commit these
+secrets/*.txt
+!secrets/README.md
+.env
+
+# TLS certs (self-signed, regenerate)
+nginx/certs/*.pem
+
+# Data
+data/*.jsonl
+!data/sample.jsonl
+
+# OS
+.DS_Store
+Thumbs.db
