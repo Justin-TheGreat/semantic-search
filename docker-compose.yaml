@@ -1,0 +1,118 @@
+services:
+
+  api:
+    build:
+      context: .
+      target: runtime
+    container_name: search-api
+    secrets:
+      - db_password
+    environment:
+      - ENV=production
+      - LOG_LEVEL=INFO
+      - DB_PASSWORD_FILE=/run/secrets/db_password
+    volumes:
+      - model-cache:/models
+      - ./data:/app/data:ro
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    networks: [frontend, backend]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  db:
+    image: postgres:15-alpine
+    container_name: search-db
+    secrets:
+      - db_password
+    environment:
+      POSTGRES_USER: searchuser
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+      POSTGRES_DB: searchdb
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U searchuser -d searchdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [backend]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  redis:
+    image: redis:7-alpine
+    container_name: search-redis
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+    networks: [backend]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: search-qdrant
+    volumes:
+      - qdrant-data:/qdrant/storage
+    networks: [backend]
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+
+  nginx:
+    image: nginx:alpine
+    container_name: search-nginx
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/certs:/etc/ssl/certs:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [frontend]
+    restart: unless-stopped
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  pg-data:
+  redis-data:
+  qdrant-data:
+  model-cache:
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
