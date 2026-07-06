@@ -11,6 +11,9 @@ services:
       - ENV=production
       - LOG_LEVEL=INFO
       - DB_PASSWORD_FILE=/run/secrets/db_password
+      - ENABLE_HYBRID=true
+      - VLLM_BASE_URL=http://vllm:8000/v1
+      - HF_HOME=/models/hf
     volumes:
       - model-cache:/models
       - ./data:/app/data:ro
@@ -77,7 +80,8 @@ services:
           memory: 256M
 
   qdrant:
-    image: qdrant/qdrant:v1.7.4
+    # v1.12+ required for the hybrid Query API (prefetch + RRF fusion)
+    image: qdrant/qdrant:v1.12.4
     container_name: search-qdrant
     volumes:
       - qdrant-data:/qdrant/storage
@@ -103,6 +107,61 @@ services:
     networks: [ frontend ]
     restart: unless-stopped
 
+  # --- GPU serving tier (Phase 2): docker compose --profile gpu up -d ---
+  vllm:
+    image: vllm/vllm-openai:latest
+    container_name: search-vllm
+    profiles: [ gpu ]
+    command: >-
+      --model Qwen/Qwen2.5-0.5B-Instruct
+      --max-model-len 4096
+      --gpu-memory-utilization 0.85
+    ipc: host
+    ports:
+      - "8001:8000"
+    volumes:
+      - vllm-cache:/root/.cache/huggingface
+    networks: [ backend ]
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+
+  # --- Monitoring (Phase 6): docker compose --profile monitoring up -d ---
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: search-prometheus
+    profiles: [ monitoring ]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - prometheus-data:/prometheus
+    networks: [ backend ]
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: search-grafana
+    profiles: [ monitoring ]
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks: [ backend ]
+    restart: unless-stopped
+
 networks:
   frontend:
   backend:
@@ -112,36 +171,10 @@ volumes:
   redis-data:
   qdrant-data:
   model-cache:
+  vllm-cache:
+  prometheus-data:
+  grafana-data:
 
 secrets:
   db_password:
     file: ./secrets/db_password.txt
-
-prometheus:
-  image: prom/prometheus:latest
-  container_name: search-prometheus
-  profiles: [ monitoring ]
-  volumes:
-    - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    - prometheus-data:/prometheus
-  networks: [ backend ]
-  restart: unless-stopped
-
-grafana:
-  image: grafana/grafana:latest
-  container_name: search-grafana
-  profiles: [ monitoring ]
-  ports:
-    - "3000:3000"
-  environment:
-    - GF_SECURITY_ADMIN_PASSWORD=admin
-  volumes:
-    - grafana-data:/var/lib/grafana
-  depends_on:
-    - prometheus
-  networks: [ backend ]
-  restart: unless-stopped
-
-# In the 'volumes:' section at the bottom, add:
-prometheus-data:
-grafana-data:

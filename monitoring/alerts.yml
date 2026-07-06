@@ -1,0 +1,26 @@
+groups:
+  - name: ragship
+    rules:
+      - alert: ChatLatencyP95High
+        expr: histogram_quantile(0.95, sum(rate(chat_latency_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 /chat latency above 2s for 5 minutes"
+
+      - alert: SearchLatencyP95High
+        expr: histogram_quantile(0.95, sum(rate(search_latency_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 /search latency above 1s for 5 minutes"
+
+      - alert: ApiDown
+        expr: up{job="semantic-search"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "semantic-search API target is down"

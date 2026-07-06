@@ -1,0 +1,103 @@
+{
+  "title": "RAGShip — Agentic RAG Platform",
+  "uid": "ragship",
+  "schemaVersion": 39,
+  "refresh": "10s",
+  "time": { "from": "now-30m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "p95 /chat latency",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(chat_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95 /chat"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(search_latency_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95 /search"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "LLM tokens / sec",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "rate(llm_completion_tokens_total[5m])", "legendFormat": "completion tok/s" },
+        { "expr": "rate(llm_prompt_tokens_total[5m])", "legendFormat": "prompt tok/s" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Cache hit ratio",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "max": 1, "min": 0 }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "sum(rate(chat_requests_total{cached=\"True\"}[15m])) / sum(rate(chat_requests_total[15m]))",
+          "legendFormat": "semantic cache (/chat)"
+        },
+        {
+          "expr": "sum(rate(search_requests_total{cached=\"True\"}[15m])) / sum(rate(search_requests_total[15m]))",
+          "legendFormat": "redis cache (/search)"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Agent graph — p95 per node",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(graph_node_seconds_bucket[5m])) by (le, node))",
+          "legendFormat": "{{node}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Requests by cache state",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "sum(rate(chat_requests_total[5m])) by (cached)", "legendFormat": "chat cached={{cached}}" },
+        { "expr": "sum(rate(search_requests_total[5m])) by (cached)", "legendFormat": "search cached={{cached}}" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "vLLM — GPU KV-cache usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "fieldConfig": { "defaults": { "unit": "percentunit", "max": 1, "min": 0 }, "overrides": [] },
+      "targets": [
+        { "expr": "vllm:gpu_cache_usage_perc", "legendFormat": "KV cache used" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "vLLM — requests running / waiting",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        { "expr": "vllm:num_requests_running", "legendFormat": "running" },
+        { "expr": "vllm:num_requests_waiting", "legendFormat": "waiting" }
+      ]
+    }
+  ]
+}
