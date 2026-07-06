@@ -22,12 +22,12 @@ services:
       qdrant:
         condition: service_started
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 60s
-    networks: [frontend, backend]
+    networks: [ frontend, backend ]
     restart: unless-stopped
     deploy:
       resources:
@@ -47,12 +47,12 @@ services:
     volumes:
       - pg-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U searchuser -d searchdb"]
+      test: [ "CMD-SHELL", "pg_isready -U searchuser -d searchdb" ]
       interval: 5s
       timeout: 5s
       retries: 10
       start_period: 10s
-    networks: [backend]
+    networks: [ backend ]
     restart: unless-stopped
     deploy:
       resources:
@@ -66,10 +66,10 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       retries: 5
-    networks: [backend]
+    networks: [ backend ]
     restart: unless-stopped
     deploy:
       resources:
@@ -81,7 +81,7 @@ services:
     container_name: search-qdrant
     volumes:
       - qdrant-data:/qdrant/storage
-    networks: [backend]
+    networks: [ backend ]
     restart: unless-stopped
     deploy:
       resources:
@@ -100,7 +100,7 @@ services:
     depends_on:
       api:
         condition: service_healthy
-    networks: [frontend]
+    networks: [ frontend ]
     restart: unless-stopped
 
 networks:
@@ -116,3 +116,32 @@ volumes:
 secrets:
   db_password:
     file: ./secrets/db_password.txt
+
+prometheus:
+  image: prom/prometheus:latest
+  container_name: search-prometheus
+  profiles: [ monitoring ]
+  volumes:
+    - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    - prometheus-data:/prometheus
+  networks: [ backend ]
+  restart: unless-stopped
+
+grafana:
+  image: grafana/grafana:latest
+  container_name: search-grafana
+  profiles: [ monitoring ]
+  ports:
+    - "3000:3000"
+  environment:
+    - GF_SECURITY_ADMIN_PASSWORD=admin
+  volumes:
+    - grafana-data:/var/lib/grafana
+  depends_on:
+    - prometheus
+  networks: [ backend ]
+  restart: unless-stopped
+
+# In the 'volumes:' section at the bottom, add:
+prometheus-data:
+grafana-data:
