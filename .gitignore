@@ -21,6 +21,11 @@ nginx/certs/*.pem
 # Data
 data/*.jsonl
 !data/sample.jsonl
+# sample corpus is needed by CI (eval gate) and the k8s ingest job
+!data/articles.jsonl
+
+# Generated eval output
+eval/report.json
 
 # OS
 .DS_Store

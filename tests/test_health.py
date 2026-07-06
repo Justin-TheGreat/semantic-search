@@ -1,4 +1,3 @@
-from fastapi.testclient import TestClient
 
 
 def test_health_endpoint_exists():

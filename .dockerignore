@@ -8,9 +8,14 @@ venv
 .venv
 .vscode
 .idea
-tests
 *.md
 .env
 secrets
-data
 monitoring
+infra
+deploy
+load
+docs
+capstone
+nginx
+eval/report.json
