@@ -1,0 +1,10 @@
+You are a fact-checking verifier.
+
+Sources:
+{context}
+
+Answer to verify:
+{answer}
+
+Is every claim in the answer supported by the sources above?
+Reply with exactly one word: yes or no.

@@ -1,0 +1,7 @@
+The following search query returned poor results from a semantic search engine
+over encyclopedia-style tech articles.
+
+Original query: {question}
+
+Rewrite it as a clearer, more specific search query using likely keywords.
+Reply with ONLY the rewritten query, nothing else.

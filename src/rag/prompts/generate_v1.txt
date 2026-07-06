@@ -1,0 +1,9 @@
+Answer the question using ONLY the context below.
+
+Context:
+{context}
+
+Question: {question}
+
+Answer concisely. After every fact, cite its source id in square brackets, e.g. [a001].
+If the context does not contain the answer, say "I don't know based on the indexed articles."

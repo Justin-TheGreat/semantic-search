@@ -1,0 +1,20 @@
+{"q": "What is machine learning?", "must_include": ["data"], "must_cite": ["a001"]}
+{"q": "How do systems learn without being explicitly programmed?", "must_include": ["machine learning"], "must_cite": ["a001"]}
+{"q": "Is machine learning a branch of artificial intelligence?", "must_include": ["artificial intelligence"], "must_cite": ["a001"]}
+{"q": "Which platform ships applications in containers?", "must_include": ["docker"], "must_cite": ["a002"]}
+{"q": "What technology uses OS-level virtualization?", "must_include": ["container"], "must_cite": ["a002"]}
+{"q": "How do Docker containers isolate applications from each other?", "must_include": ["isolated"], "must_cite": ["a002"]}
+{"q": "What is Kubernetes used for?", "must_include": ["orchestration"], "must_cite": ["a003"]}
+{"q": "Who originally designed Kubernetes?", "must_include": ["google"], "must_cite": ["a003"]}
+{"q": "Which foundation maintains the Kubernetes project?", "must_include": ["cloud native computing foundation"], "must_cite": ["a003"]}
+{"q": "What does Kubernetes automate?", "must_include": ["deployment"], "must_cite": ["a003"]}
+{"q": "What is PostgreSQL?", "must_include": ["relational"], "must_cite": ["a004"]}
+{"q": "What was PostgreSQL originally called?", "must_include": ["postgres"], "must_cite": ["a004"]}
+{"q": "Which database emphasizes extensibility and SQL compliance?", "must_include": ["postgresql"], "must_cite": ["a004"]}
+{"q": "Which database system is a successor to Ingres?", "must_include": ["postgres"], "must_cite": ["a004"]}
+{"q": "What kind of database stores vector embeddings?", "must_include": ["vector"], "must_cite": ["a005"]}
+{"q": "What is a vector database optimized for?", "must_include": ["similarity search"], "must_cite": ["a005"]}
+{"q": "Name some applications of vector databases", "must_include": ["recommendation"], "must_cite": ["a005"]}
+{"q": "What computing systems mimic the way the human brain operates?", "must_include": ["neural"], "must_cite": ["a006"]}
+{"q": "What is the foundation of deep learning?", "must_include": ["neural network"], "must_cite": ["a006"]}
+{"q": "What do neural networks recognize in a set of data?", "must_include": ["relationships"], "must_cite": ["a006"]}

@@ -1,0 +1,9 @@
+You are a strict relevance grader for a retrieval system.
+
+Question: {question}
+
+Retrieved passages:
+{context}
+
+Do these passages contain information that can answer the question?
+Reply with exactly one word: yes or no.

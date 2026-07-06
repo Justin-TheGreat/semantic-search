@@ -35,6 +35,9 @@ COPY --from=builder /install /usr/local
 
 WORKDIR /app
 COPY src/ ./src/
+# eval harness + sample corpus ship in the image so ingest/eval run in k8s too
+COPY eval/ ./eval/
+COPY data/ ./data/
 
 # Create non-root user for security
 RUN useradd --create-home --uid 1001 appuser && \
