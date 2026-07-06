@@ -1,0 +1,13 @@
+# RAGShip toolchain — pinned minimums (record your exact versions after install)
+#
+# install (Windows):  winget install Kubernetes.kind Kubernetes.kubectl Helm.Helm Hashicorp.Terraform
+# verify each with the command in parentheses.
+
+kind      >= 0.23    (kind version)
+kubectl   >= 1.30    (kubectl version --client)
+helm      >= 3.14    (helm version)
+terraform >= 1.7     (terraform -version)
+k6        >= 0.50    (k6 version)          # optional — Phase 9 load test: winget install k6
+docker    Docker Desktop with WSL2 integration + GPU enabled
+          (docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi)
+python    3.11 in the container (host python only needed for optional local dev)
