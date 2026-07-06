@@ -1,10 +1,15 @@
 import json
 import sys
 from pathlib import Path
+# pyrefly: ignore [missing-import]
 import psycopg
+# pyrefly: ignore [missing-import]
 from sentence_transformers import SentenceTransformer
+# pyrefly: ignore [missing-import]
 from qdrant_client import QdrantClient
+# pyrefly: ignore [missing-import]
 from qdrant_client.models import PointStruct, VectorParams, Distance
+# pyrefly: ignore [missing-import]
 from src.config import settings
 
 
