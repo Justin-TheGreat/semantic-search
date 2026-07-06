@@ -1,0 +1,40 @@
+replicaCount: 1
+
+image:
+  repository: ragship
+  tag: local
+  # kind-loaded images cannot be pulled from a registry
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 8000
+  nodePort: 30080
+
+env:
+  qdrantHost: qdrant
+  dbHost: postgresql
+  redisHost: redis
+  # vLLM stays on the host GPU (Phase 2); pods reach it via the ExternalName service
+  vllmBaseUrl: http://vllm:8001/v1
+  enableHybrid: "true"
+
+secretName: ragship-db
+
+resources:
+  requests:
+    cpu: 250m
+    memory: 1Gi
+  limits:
+    cpu: "2"
+    memory: 2Gi
+
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80
+
+vllmExternal:
+  enabled: true
+  host: host.docker.internal

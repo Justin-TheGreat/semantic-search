@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+    spec:
+      securityContext:
+        fsGroup: 1001
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 8000
+          env:
+            - name: QDRANT_HOST
+              value: {{ .Values.env.qdrantHost | quote }}
+            - name: DB_HOST
+              value: {{ .Values.env.dbHost | quote }}
+            - name: REDIS_HOST
+              value: {{ .Values.env.redisHost | quote }}
+            - name: VLLM_BASE_URL
+              value: {{ .Values.env.vllmBaseUrl | quote }}
+            - name: ENABLE_HYBRID
+              value: {{ .Values.env.enableHybrid | quote }}
+            - name: HF_HOME
+              value: /models/hf
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.secretName }}
+                  key: password
+          volumeMounts:
+            - name: models
+              mountPath: /models
+          # First boot downloads embedding models — allow up to 10 minutes
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+            failureThreshold: 60
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: models
+          emptyDir: {}

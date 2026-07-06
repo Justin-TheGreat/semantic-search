@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ragship
+description: Agentic RAG platform gateway (FastAPI + LangGraph)
+type: application
+version: 0.1.0
+appVersion: "1.0"

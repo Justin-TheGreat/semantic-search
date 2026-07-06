@@ -1,0 +1,11 @@
+{{- if .Values.vllmExternal.enabled }}
+# Single-GPU pragmatic pattern: vLLM keeps running on the host (compose gpu
+# profile); in-cluster pods resolve "vllm" to the Docker Desktop host.
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm
+spec:
+  type: ExternalName
+  externalName: {{ .Values.vllmExternal.host }}
+{{- end }}
