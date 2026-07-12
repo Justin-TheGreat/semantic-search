@@ -93,9 +93,12 @@ regression turns the build red before it can merge.
 ## Docs
 
 - [How to run everything](docs/HOW_TO_RUN.md)
+- [Live test run notes](docs/TEST_RUN_NOTES.md) — what broke on a real run and how it was fixed
 - ADRs: [hybrid retrieval](docs/adr/0001-hybrid-retrieval.md) ·
   [host-GPU vLLM](docs/adr/0002-host-gpu-vllm.md) ·
   [eval gate](docs/adr/0003-eval-gate.md) ·
-  [plain manifests over Bitnami](docs/adr/0004-plain-manifests-over-bitnami.md)
+  [plain manifests over Bitnami](docs/adr/0004-plain-manifests-over-bitnami.md) ·
+  [pin vLLM version](docs/adr/0005-pin-vllm-version.md) ·
+  [k8s Service env collision](docs/adr/0006-k8s-service-env-collision.md)
 - [Design review Q&A](docs/design-review.md)
 - [Capstone runbook](AI-Infra-Capstone_Runbook_v1.md) — the phase-by-phase build plan
