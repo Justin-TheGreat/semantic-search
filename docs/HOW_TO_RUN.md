@@ -217,6 +217,7 @@ git push --tags
 | Symptom | Fix |
 |---|---|
 | `--gpus all` → "could not select device driver" | Docker Desktop → Settings → enable GPU / WSL integration; update the NVIDIA **Windows** driver |
+| vLLM crashes with `RuntimeError: UVA is not available` | Known issue with vLLM's newest releases under Docker Desktop's WSL2 GPU passthrough (their V2 GPU model runner requires CUDA Unified Virtual Addressing, which WSL2 passthrough doesn't expose). Already fixed here by pinning `vllm/vllm-openai:v0.7.3` in docker-compose.yaml instead of `:latest` — verified working on RTX 3060/WSL2. If you bump the tag, re-verify this still works. |
 | vLLM: CUDA out of memory | Lower `--max-model-len` to 2048 or `--gpu-memory-utilization` to 0.7 in docker-compose.yaml; close other GPU apps |
 | vLLM: shared-memory RuntimeError | `ipc: host` is already set in compose — if running `docker run` manually, add `--ipc=host` |
 | First /chat very slow | First call downloads weights + compiles CUDA graphs; send one warm-up request |

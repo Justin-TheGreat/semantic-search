@@ -29,6 +29,16 @@ spec:
               value: {{ .Values.env.dbHost | quote }}
             - name: REDIS_HOST
               value: {{ .Values.env.redisHost | quote }}
+            # Kubernetes auto-injects legacy Docker-links vars for every
+            # Service in the namespace (e.g. QDRANT_PORT=tcp://10.x.x.x:6333),
+            # which collide with and break these int Settings fields unless
+            # pinned explicitly here. See docs/adr/0006-k8s-service-env-collision.md
+            - name: QDRANT_PORT
+              value: "6333"
+            - name: DB_PORT
+              value: "5432"
+            - name: REDIS_PORT
+              value: "6379"
             - name: VLLM_BASE_URL
               value: {{ .Values.env.vllmBaseUrl | quote }}
             - name: ENABLE_HYBRID

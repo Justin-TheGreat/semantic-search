@@ -5,9 +5,20 @@
 
 kind      >= 0.23    (kind version)
 kubectl   >= 1.30    (kubectl version --client)
-helm      >= 3.14    (helm version)
+helm      >= 3.14    (helm version)         # note: v4.x also verified working (see below)
 terraform >= 1.7     (terraform -version)
 k6        >= 0.50    (k6 version)          # optional — Phase 9 load test: winget install k6
 docker    Docker Desktop with WSL2 integration + GPU enabled
           (docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi)
 python    3.11 in the container (host python only needed for optional local dev)
+
+# --- Actually installed + verified end-to-end on this machine, 2026-07-12 ---
+# GPU: NVIDIA GeForce RTX 3060 12GB, driver 595.61 (WSL2), CUDA 13.2
+# Docker Desktop 29.5.2
+kind      v0.32.0     (winget install Kubernetes.kind)
+kubectl   (bundled with Docker Desktop)
+helm      v4.2.3      (winget install Helm.Helm — winget has no separate v3 package;
+                        this repo's chart worked fine under Helm 4)
+terraform v1.15.8     (winget install Hashicorp.Terraform)
+vllm      v0.7.3      (pinned in docker-compose.yaml — see docs/adr/0005-pin-vllm-version.md;
+                        do NOT use vllm/vllm-openai:latest, it crashes under WSL2 GPU passthrough)

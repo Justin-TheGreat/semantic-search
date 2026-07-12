@@ -109,7 +109,11 @@ services:
 
   # --- GPU serving tier (Phase 2): docker compose --profile gpu up -d ---
   vllm:
-    image: vllm/vllm-openai:latest
+    # Pinned (not :latest): 0.7.3 predates vLLM's newer V2 GPU model runner,
+    # which requires CUDA UVA and crashes ("RuntimeError: UVA is not
+    # available") under Docker Desktop's WSL2 GPU passthrough. Verified
+    # working on RTX 3060 / WSL2 / Docker Desktop.
+    image: vllm/vllm-openai:v0.7.3
     container_name: search-vllm
     profiles: [ gpu ]
     command: >-

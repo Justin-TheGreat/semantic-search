@@ -1,5 +1,5 @@
 # ═══ STAGE 1: builder (heavy, has pip + compilers) ═══
-FROM python:3.11-slim-bookworm@sha256:6e61454355fe0dbb41d9779857c6507681af1b7b196f7485b44c9d2d272a3df0 AS builder
+FROM python:3.11-slim-bookworm@sha256:f5cf0344c9886ff24d34797578d5d7dd6e8911ae0fe5962bb55d0f89603ec361 AS builder
 
 # Install build tools needed for some packages
 RUN apt-get update && \
@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 # ═══ STAGE 2: test (runs pytest, fails build if tests fail) ═══
 FROM builder AS test
 WORKDIR /app
-COPY requirements-dev.txt .
+COPY requirements.txt requirements-dev.txt ./
 RUN pip install --no-cache-dir --prefix=/install -r requirements-dev.txt
 COPY src/ ./src/
 COPY tests/ ./tests/
@@ -23,7 +23,7 @@ RUN PATH=/install/bin:$PATH PYTHONPATH=/install/lib/python3.11/site-packages:/ap
 
 
 # ═══ STAGE 3: runtime (lean, final image) ═══
-FROM python:3.11-slim-bookworm@sha256:6e61454355fe0dbb41d9779857c6507681af1b7b196f7485b44c9d2d272a3df0 AS runtime
+FROM python:3.11-slim-bookworm@sha256:f5cf0344c9886ff24d34797578d5d7dd6e8911ae0fe5962bb55d0f89603ec361 AS runtime
 
 # Install only runtime deps (curl needed for healthcheck)
 RUN apt-get update && \
